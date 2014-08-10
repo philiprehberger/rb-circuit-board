@@ -55,59 +55,59 @@ RSpec.describe Philiprehberger::CircuitBoard do
   describe Philiprehberger::CircuitBoard::Status do
     describe '#healthy?' do
       it 'returns true when all checks pass' do
-        described_class.configure do
+        Philiprehberger::CircuitBoard.configure do
           check(:a) { true }
           check(:b) { true }
         end
 
-        expect(described_class.check.healthy?).to be true
+        expect(Philiprehberger::CircuitBoard.check.healthy?).to be true
       end
 
       it 'returns false when any check fails' do
-        described_class.configure do
+        Philiprehberger::CircuitBoard.configure do
           check(:a) { true }
           check(:b) { false }
         end
 
-        expect(described_class.check.healthy?).to be false
+        expect(Philiprehberger::CircuitBoard.check.healthy?).to be false
       end
     end
 
     describe '#degraded?' do
       it 'returns true when some checks pass and some fail' do
-        described_class.configure do
+        Philiprehberger::CircuitBoard.configure do
           check(:a) { true }
           check(:b) { false }
         end
 
-        expect(described_class.check.degraded?).to be true
+        expect(Philiprehberger::CircuitBoard.check.degraded?).to be true
       end
 
       it 'returns false when all checks pass' do
-        described_class.configure do
+        Philiprehberger::CircuitBoard.configure do
           check(:a) { true }
         end
 
-        expect(described_class.check.degraded?).to be false
+        expect(Philiprehberger::CircuitBoard.check.degraded?).to be false
       end
 
       it 'returns false when all checks fail' do
-        described_class.configure do
+        Philiprehberger::CircuitBoard.configure do
           check(:a) { false }
           check(:b) { false }
         end
 
-        expect(described_class.check.degraded?).to be false
+        expect(Philiprehberger::CircuitBoard.check.degraded?).to be false
       end
     end
 
     describe '#to_h' do
       it 'returns hash with status and checks' do
-        described_class.configure do
+        Philiprehberger::CircuitBoard.configure do
           check(:db) { true }
         end
 
-        result = described_class.check.to_h
+        result = Philiprehberger::CircuitBoard.check.to_h
         expect(result[:status]).to eq('healthy')
         expect(result[:checks]).to be_an(Array)
         expect(result[:checks].first[:name]).to eq(:db)
@@ -115,21 +115,21 @@ RSpec.describe Philiprehberger::CircuitBoard do
       end
 
       it 'reports degraded status' do
-        described_class.configure do
+        Philiprehberger::CircuitBoard.configure do
           check(:ok) { true }
           check(:bad) { false }
         end
 
-        result = described_class.check.to_h
+        result = Philiprehberger::CircuitBoard.check.to_h
         expect(result[:status]).to eq('degraded')
       end
 
       it 'reports unhealthy status' do
-        described_class.configure do
+        Philiprehberger::CircuitBoard.configure do
           check(:bad) { false }
         end
 
-        result = described_class.check.to_h
+        result = Philiprehberger::CircuitBoard.check.to_h
         expect(result[:status]).to eq('unhealthy')
       end
     end
