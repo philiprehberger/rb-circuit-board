@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-03-24
+
+### Fixed
+- Fix stray character in CHANGELOG formatting
+
 ## [0.1.3] - 2026-03-22
 
 ### Changed
@@ -16,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Version bump for republishing
-n## [0.1.1] - 2026-03-22
+## [0.1.1] - 2026-03-22
 
 ### Changed
 - Version bump for republishing
