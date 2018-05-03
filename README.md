@@ -3,6 +3,7 @@
 [![Tests](https://github.com/philiprehberger/rb-circuit-board/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-circuit-board/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-circuit_board.svg)](https://rubygems.org/gems/philiprehberger-circuit_board)
 [![License](https://img.shields.io/github/license/philiprehberger/rb-circuit-board)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 Health check framework with dependency aggregation and Rack endpoint
 
@@ -92,4 +93,4 @@ bundle exec rubocop
 
 ## License
 
-MIT
+[MIT](LICENSE)
