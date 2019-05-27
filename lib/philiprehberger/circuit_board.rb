@@ -16,9 +16,9 @@ module Philiprehberger
     #
     # @yield [Configuration] the configuration instance
     # @return [void]
-    def self.configure(&block)
+    def self.configure(&)
       @configuration = Configuration.new
-      @configuration.instance_eval(&block)
+      @configuration.instance_eval(&)
     end
 
     # Run all configured health checks and return an aggregated status.

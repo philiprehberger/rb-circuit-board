@@ -30,7 +30,11 @@ module Philiprehberger
       # @return [Hash] status hash with :status and :checks keys
       def to_h
         {
-          status: healthy? ? 'healthy' : (degraded? ? 'degraded' : 'unhealthy'),
+          status: if healthy?
+                    'healthy'
+                  else
+                    (degraded? ? 'degraded' : 'unhealthy')
+                  end,
           checks: @results
         }
       end
