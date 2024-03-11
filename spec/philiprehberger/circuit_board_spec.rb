@@ -337,6 +337,50 @@ RSpec.describe Philiprehberger::CircuitBoard do
     end
   end
 
+  describe 'on_change callback' do
+    it 'calls callback when status changes' do
+      transitions = []
+      described_class.configure do |c|
+        c.check('always_pass') { true }
+        c.on_change { |from, to| transitions << [from, to] }
+      end
+
+      described_class.check
+      described_class.check
+
+      # Reconfigure to fail
+      described_class.configure do |c|
+        c.check('always_fail') { raise 'boom' }
+        c.on_change { |from, to| transitions << [from, to] }
+      end
+
+      described_class.check
+      expect(transitions.last).to eq(%i[healthy unhealthy])
+    end
+
+    it 'does not call callback on first check' do
+      called = false
+      described_class.configure do |c|
+        c.check('pass') { true }
+        c.on_change { |_from, _to| called = true }
+      end
+
+      described_class.check
+      expect(called).to be false
+    end
+
+    it 'does not call callback when status unchanged' do
+      call_count = 0
+      described_class.configure do |c|
+        c.check('pass') { true }
+        c.on_change { |_from, _to| call_count += 1 }
+      end
+
+      3.times { described_class.check }
+      expect(call_count).to eq(0)
+    end
+  end
+
   describe Philiprehberger::CircuitBoard::Rack::Middleware do
     let(:inner_app) { ->(_env) { [200, {}, ['ok']] } }
     let(:middleware) { described_class.new(inner_app) }

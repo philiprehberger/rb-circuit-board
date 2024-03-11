@@ -11,6 +11,7 @@ module Philiprehberger
     class Error < StandardError; end
 
     @configuration = Configuration.new
+    @previous_status = nil
 
     # Configure health checks using a DSL block.
     #
@@ -26,7 +27,16 @@ module Philiprehberger
     # @return [Status] the aggregated health status
     def self.check
       results = @configuration.checks.map(&:call)
-      Status.new(results)
+      status = Status.new(results)
+
+      new_status = status.to_h[:status]
+      new_status_sym = new_status.to_sym
+      if @configuration.on_change_callback && @previous_status && @previous_status != new_status_sym
+        @configuration.on_change_callback.call(@previous_status, new_status_sym)
+      end
+      @previous_status = new_status_sym
+
+      status
     end
 
     # Reset all configured checks.
@@ -34,6 +44,7 @@ module Philiprehberger
     # @return [void]
     def self.reset!
       @configuration = Configuration.new
+      @previous_status = nil
     end
   end
 end
