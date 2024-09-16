@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-04
+
+### Added
+- `check_one(name)` method to run a single named check and return its result hash
+
 ## [0.2.0] - 2026-04-04
 
 ### Added

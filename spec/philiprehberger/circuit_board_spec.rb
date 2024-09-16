@@ -72,6 +72,63 @@ RSpec.describe Philiprehberger::CircuitBoard do
     end
   end
 
+  describe '.check_one' do
+    it 'runs a single named check by symbol' do
+      described_class.configure do
+        check(:database) { true }
+        check(:redis) { false }
+      end
+
+      result = described_class.check_one(:database)
+      expect(result[:name]).to eq(:database)
+      expect(result[:healthy]).to be true
+    end
+
+    it 'runs a single named check by string' do
+      described_class.configure do
+        check(:database) { true }
+      end
+
+      result = described_class.check_one('database')
+      expect(result[:name]).to eq(:database)
+      expect(result[:healthy]).to be true
+    end
+
+    it 'raises Error for unknown check name' do
+      described_class.configure do
+        check(:database) { true }
+      end
+
+      expect { described_class.check_one(:nonexistent) }
+        .to raise_error(Philiprehberger::CircuitBoard::Error, 'unknown check: nonexistent')
+    end
+
+    it 'returns result hash with duration' do
+      described_class.configure do
+        check(:db) { true }
+      end
+
+      result = described_class.check_one(:db)
+      expect(result).to have_key(:duration)
+      expect(result[:duration]).to be_a(Float)
+    end
+
+    it 'captures exceptions as unhealthy' do
+      described_class.configure do
+        check(:broken) { raise 'connection failed' }
+      end
+
+      result = described_class.check_one(:broken)
+      expect(result[:healthy]).to be false
+      expect(result[:error]).to eq('connection failed')
+    end
+
+    it 'raises Error when no checks are configured' do
+      expect { described_class.check_one(:anything) }
+        .to raise_error(Philiprehberger::CircuitBoard::Error)
+    end
+  end
+
   describe '.reset!' do
     it 'clears all checks' do
       described_class.configure do
