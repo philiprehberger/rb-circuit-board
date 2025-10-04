@@ -69,6 +69,19 @@ Exposes three endpoints:
 - `GET /health/ready` - readiness probe (all checks must pass)
 - `GET /health/live` - liveness probe (always returns 200)
 
+### Critical and Non-Critical Checks
+
+```ruby
+Philiprehberger::CircuitBoard.configure do
+  check(:database) { ActiveRecord::Base.connection.active? }          # critical (default)
+  check(:cache, critical: false) { Redis.current.ping == 'PONG' }    # non-critical
+end
+
+status = Philiprehberger::CircuitBoard.check
+# If only cache fails: status is "degraded"
+# If database fails:   status is "unhealthy"
+```
+
 ### Check Timeouts
 
 ```ruby
@@ -95,7 +108,7 @@ end
 
 | Method | Description |
 |--------|-------------|
-| `.configure { ... }` | Define health checks using the DSL |
+| `.configure { ... }` | Define health checks using the DSL (`check(name, timeout:, critical:)`) |
 | `.check` | Run all checks and return a Status |
 | `.check_one(name)` | Run a single named check and return its result hash |
 | `.reset!` | Remove all configured checks |

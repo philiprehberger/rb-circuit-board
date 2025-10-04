@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-09
+
+### Added
+- `critical:` option for health checks (default `true`); non-critical failures produce "degraded" status instead of "unhealthy"
+- Check result hashes now include `critical:` field
+
 ## [0.3.0] - 2026-04-04
 
 ### Added
