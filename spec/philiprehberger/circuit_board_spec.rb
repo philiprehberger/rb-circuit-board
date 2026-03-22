@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 RSpec.describe Philiprehberger::CircuitBoard do
-  before { described_class.reset! }
+  before { Philiprehberger::CircuitBoard.reset! }
 
   describe 'VERSION' do
     it 'has a version number' do
