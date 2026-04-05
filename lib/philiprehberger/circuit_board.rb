@@ -39,6 +39,18 @@ module Philiprehberger
       status
     end
 
+    # Run a single named health check and return its result hash.
+    #
+    # @param name [Symbol, String] the name of the check to run
+    # @return [Hash] result with :name, :healthy, :duration, and optionally :error
+    # @raise [Error] if no check with the given name exists
+    def self.check_one(name)
+      check_obj = @configuration.checks.find { |c| c.name.to_s == name.to_s }
+      raise Error, "unknown check: #{name}" unless check_obj
+
+      check_obj.call
+    end
+
     # Reset all configured checks.
     #
     # @return [void]

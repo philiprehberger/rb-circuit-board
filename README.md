@@ -40,6 +40,15 @@ status.degraded?  # => false
 status.to_h       # => { status: 'healthy', checks: [...] }
 ```
 
+### Single Check
+
+```ruby
+result = Philiprehberger::CircuitBoard.check_one(:database)
+# => { name: :database, healthy: true, duration: 0.0012 }
+```
+
+Raises `Philiprehberger::CircuitBoard::Error` if the named check does not exist.
+
 ### Rack Middleware
 
 ```ruby
@@ -88,6 +97,7 @@ end
 |--------|-------------|
 | `.configure { ... }` | Define health checks using the DSL |
 | `.check` | Run all checks and return a Status |
+| `.check_one(name)` | Run a single named check and return its result hash |
 | `.reset!` | Remove all configured checks |
 | `on_change(&block)` | Callback invoked on health status transitions |
 | `Status#healthy?` | Whether all checks passed |
