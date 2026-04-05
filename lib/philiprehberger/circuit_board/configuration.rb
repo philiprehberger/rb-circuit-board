@@ -8,6 +8,7 @@ module Philiprehberger
 
       def initialize
         @checks = []
+        @on_change = nil
       end
 
       # Register a health check.
@@ -18,6 +19,19 @@ module Philiprehberger
       # @return [void]
       def check(name, timeout: 5, &block)
         @checks << Check.new(name, timeout: timeout, &block)
+      end
+
+      # Register a callback for health status transitions.
+      #
+      # @yield [Symbol, Symbol] previous status and new status
+      # @return [void]
+      def on_change(&block)
+        @on_change = block
+      end
+
+      # @return [Proc, nil] the on_change callback
+      def on_change_callback
+        @on_change
       end
     end
   end

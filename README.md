@@ -69,6 +69,19 @@ Philiprehberger::CircuitBoard.configure do
 end
 ```
 
+### State Change Callback
+
+```ruby
+require "philiprehberger/circuit_board"
+
+Philiprehberger::CircuitBoard.configure do |c|
+  c.check("database") { ActiveRecord::Base.connection.active? }
+  c.on_change do |from, to|
+    puts "Health changed: #{from} -> #{to}"
+  end
+end
+```
+
 ## API
 
 | Method | Description |
@@ -76,6 +89,7 @@ end
 | `.configure { ... }` | Define health checks using the DSL |
 | `.check` | Run all checks and return a Status |
 | `.reset!` | Remove all configured checks |
+| `on_change(&block)` | Callback invoked on health status transitions |
 | `Status#healthy?` | Whether all checks passed |
 | `Status#degraded?` | Whether some checks passed but not all |
 | `Status#to_h` | Hash with :status and :checks keys |
