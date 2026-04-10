@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-10
+
+### Added
+- `CircuitBoard.check(parallel: true)` runs all health checks concurrently in threads
+- `Status#unhealthy_checks` and `Status#healthy_checks` for filtering check results
+- `Status#duration` returns the wall-clock duration of the slowest check
+- `Status#to_json` for JSON serialization
+
 ## [0.4.0] - 2026-04-09
 
 ### Added
@@ -69,3 +77,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Aggregated status reporting with healthy, degraded, and unhealthy states
 - Rack middleware for /health, /health/ready, and /health/live endpoints
 - Thread-based timeout for individual checks
+
+[0.5.0]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.5.0
+[0.4.0]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.4.0
+[0.3.0]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.3.0
+[0.2.0]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.2.0
+[0.1.7]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.1.7
+[0.1.6]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.1.6
+[0.1.5]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.1.5
+[0.1.4]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.1.4
+[0.1.3]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.1.3
+[0.1.2]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.1.2
+[0.1.1]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.1.1
+[0.1.0]: https://github.com/philiprehberger/rb-circuit-board/releases/tag/v0.1.0

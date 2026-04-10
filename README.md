@@ -82,6 +82,18 @@ status = Philiprehberger::CircuitBoard.check
 # If database fails:   status is "unhealthy"
 ```
 
+### Parallel Execution
+
+Run all checks concurrently for lower latency:
+
+```ruby
+status = Philiprehberger::CircuitBoard.check(parallel: true)
+status.healthy?          # => true
+status.duration          # => wall-clock time of the slowest check
+status.unhealthy_checks  # => []
+status.to_json           # => '{"status":"healthy","checks":[...]}'
+```
+
 ### Check Timeouts
 
 ```ruby
@@ -109,7 +121,7 @@ end
 | Method | Description |
 |--------|-------------|
 | `.configure { ... }` | Define health checks using the DSL (`check(name, timeout:, critical:)`) |
-| `.check` | Run all checks and return a Status |
+| `.check(parallel: false)` | Run all checks and return a Status; `parallel: true` runs concurrently |
 | `.check_one(name)` | Run a single named check and return its result hash |
 | `.reset!` | Remove all configured checks |
 | `on_change(&block)` | Callback invoked on health status transitions |
@@ -117,6 +129,10 @@ end
 | `Status#degraded?` | Whether some checks passed but not all |
 | `Status#to_h` | Hash with :status and :checks keys |
 | `Status#results` | Array of individual check results |
+| `Status#unhealthy_checks` | Failed check results |
+| `Status#healthy_checks` | Passed check results |
+| `Status#duration` | Wall-clock duration of slowest check |
+| `Status#to_json` | JSON string of `to_h` |
 | `Rack::Middleware.new(app)` | Rack middleware for health endpoints |
 
 ## Development

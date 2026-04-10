@@ -579,4 +579,74 @@ RSpec.describe Philiprehberger::CircuitBoard do
       expect(status.to_h[:status]).to eq('unhealthy')
     end
   end
+
+  describe '.check(parallel: true)' do
+    it 'returns correct results when run in parallel' do
+      described_class.configure do
+        check(:a) { true }
+        check(:b) { true }
+        check(:c) { false }
+      end
+      status = described_class.check(parallel: true)
+      expect(status.healthy?).to be false
+      expect(status.results.length).to eq(3)
+    end
+
+    it 'collects all check names' do
+      described_class.configure do
+        check(:x) { true }
+        check(:y) { true }
+      end
+      status = described_class.check(parallel: true)
+      names = status.results.map { |r| r[:name] }
+      expect(names).to contain_exactly(:x, :y)
+    end
+  end
+
+  describe 'Status convenience methods' do
+    it '#unhealthy_checks returns failed checks' do
+      described_class.configure do
+        check(:ok) { true }
+        check(:fail) { false }
+      end
+      status = described_class.check
+      expect(status.unhealthy_checks.length).to eq(1)
+      expect(status.unhealthy_checks.first[:name]).to eq(:fail)
+    end
+
+    it '#healthy_checks returns passed checks' do
+      described_class.configure do
+        check(:ok) { true }
+        check(:fail) { false }
+      end
+      status = described_class.check
+      expect(status.healthy_checks.length).to eq(1)
+      expect(status.healthy_checks.first[:name]).to eq(:ok)
+    end
+
+    it '#duration returns the max individual duration' do
+      described_class.configure do
+        check(:fast) { true }
+      end
+      status = described_class.check
+      expect(status.duration).to be_a(Float)
+      expect(status.duration).to be >= 0.0
+    end
+
+    it '#duration returns 0.0 when no checks' do
+      status = Philiprehberger::CircuitBoard::Status.new([])
+      expect(status.duration).to eq(0.0)
+    end
+
+    it '#to_json returns valid JSON' do
+      described_class.configure do
+        check(:db) { true }
+      end
+      status = described_class.check
+      json = status.to_json
+      parsed = JSON.parse(json)
+      expect(parsed['status']).to eq('healthy')
+      expect(parsed['checks']).to be_a(Array)
+    end
+  end
 end
