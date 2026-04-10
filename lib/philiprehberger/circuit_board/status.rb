@@ -18,11 +18,13 @@ module Philiprehberger
         @results.all? { |r| r[:healthy] }
       end
 
-      # Whether some checks passed but not all.
+      # Whether the system is degraded: all critical checks pass but at least one non-critical fails.
       #
       # @return [Boolean]
       def degraded?
-        !healthy? && @results.any? { |r| r[:healthy] }
+        return false if healthy?
+
+        critical_ok? && @results.any? { |r| !r[:healthy] }
       end
 
       # Convert to a hash representation.
@@ -30,13 +32,22 @@ module Philiprehberger
       # @return [Hash] status hash with :status and :checks keys
       def to_h
         {
-          status: if healthy?
-                    'healthy'
-                  else
-                    (degraded? ? 'degraded' : 'unhealthy')
-                  end,
+          status: compute_status,
           checks: @results
         }
+      end
+
+      private
+
+      def critical_ok?
+        @results.select { |r| r[:critical] }.all? { |r| r[:healthy] }
+      end
+
+      def compute_status
+        return 'healthy' if healthy?
+        return 'degraded' if degraded?
+
+        'unhealthy'
       end
     end
   end

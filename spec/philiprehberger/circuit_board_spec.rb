@@ -192,10 +192,10 @@ RSpec.describe Philiprehberger::CircuitBoard do
     end
 
     describe '#degraded?' do
-      it 'returns true when some checks pass and some fail' do
+      it 'returns true when some checks pass and a non-critical one fails' do
         Philiprehberger::CircuitBoard.configure do
           check(:a) { true }
-          check(:b) { false }
+          check(:b, critical: false) { false }
         end
 
         expect(Philiprehberger::CircuitBoard.check.degraded?).to be true
@@ -218,11 +218,11 @@ RSpec.describe Philiprehberger::CircuitBoard do
         expect(Philiprehberger::CircuitBoard.check.degraded?).to be false
       end
 
-      it 'returns true with multiple passing and one failing' do
+      it 'returns true with multiple passing and one non-critical failing' do
         Philiprehberger::CircuitBoard.configure do
           check(:a) { true }
           check(:b) { true }
-          check(:c) { false }
+          check(:c, critical: false) { false }
         end
 
         expect(Philiprehberger::CircuitBoard.check.degraded?).to be true
@@ -247,10 +247,10 @@ RSpec.describe Philiprehberger::CircuitBoard do
         expect(result[:checks].first[:healthy]).to be true
       end
 
-      it 'reports degraded status' do
+      it 'reports degraded status when non-critical check fails' do
         Philiprehberger::CircuitBoard.configure do
           check(:ok) { true }
-          check(:bad) { false }
+          check(:bad, critical: false) { false }
         end
 
         result = Philiprehberger::CircuitBoard.check.to_h
@@ -517,6 +517,66 @@ RSpec.describe Philiprehberger::CircuitBoard do
       _status, _headers, body = middleware.call('PATH_INFO' => '/health/live')
       parsed = JSON.parse(body.first)
       expect(parsed['status']).to eq('alive')
+    end
+  end
+
+  describe 'critical: option' do
+    before { Philiprehberger::CircuitBoard.reset! }
+
+    it 'defaults checks to critical' do
+      described_class.configure do
+        check(:db) { true }
+      end
+      result = described_class.check_one(:db)
+      expect(result[:critical]).to be(true)
+    end
+
+    it 'allows marking a check as non-critical' do
+      described_class.configure do
+        check(:cache, critical: false) { true }
+      end
+      result = described_class.check_one(:cache)
+      expect(result[:critical]).to be(false)
+    end
+
+    it 'returns degraded when only non-critical checks fail' do
+      described_class.configure do
+        check(:db) { true }
+        check(:cache, critical: false) { false }
+      end
+      status = described_class.check
+      expect(status.degraded?).to be(true)
+      expect(status.to_h[:status]).to eq('degraded')
+    end
+
+    it 'returns unhealthy when a critical check fails' do
+      described_class.configure do
+        check(:db) { false }
+        check(:cache, critical: false) { true }
+      end
+      status = described_class.check
+      expect(status.healthy?).to be(false)
+      expect(status.degraded?).to be(false)
+      expect(status.to_h[:status]).to eq('unhealthy')
+    end
+
+    it 'returns healthy when all checks pass' do
+      described_class.configure do
+        check(:db) { true }
+        check(:cache, critical: false) { true }
+      end
+      status = described_class.check
+      expect(status.healthy?).to be(true)
+      expect(status.to_h[:status]).to eq('healthy')
+    end
+
+    it 'returns unhealthy when all checks fail including critical' do
+      described_class.configure do
+        check(:db) { false }
+        check(:cache, critical: false) { false }
+      end
+      status = described_class.check
+      expect(status.to_h[:status]).to eq('unhealthy')
     end
   end
 end

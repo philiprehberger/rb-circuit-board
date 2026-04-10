@@ -17,8 +17,8 @@ module Philiprehberger
       # @param timeout [Numeric] timeout in seconds
       # @param block [Proc] block that returns truthy if healthy
       # @return [void]
-      def check(name, timeout: 5, &block)
-        @checks << Check.new(name, timeout: timeout, &block)
+      def check(name, timeout: 5, critical: true, &block)
+        @checks << Check.new(name, timeout: timeout, critical: critical, &block)
       end
 
       # Register a callback for health status transitions.

@@ -4,14 +4,16 @@ module Philiprehberger
   module CircuitBoard
     # Represents a single health check definition.
     class Check
-      attr_reader :name, :timeout
+      attr_reader :name, :timeout, :critical
 
       # @param name [Symbol] the check name
       # @param timeout [Numeric] timeout in seconds
+      # @param critical [Boolean] whether this check is critical (default: true)
       # @param block [Proc] block that returns truthy if healthy
-      def initialize(name, timeout: 5, &block)
+      def initialize(name, timeout: 5, critical: true, &block)
         @name = name
         @timeout = timeout
+        @critical = critical
         @block = block
       end
 
@@ -22,10 +24,10 @@ module Philiprehberger
         start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         healthy = execute_with_timeout
         duration = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
-        { name: @name, healthy: healthy, duration: duration.round(4) }
+        { name: @name, healthy: healthy, critical: @critical, duration: duration.round(4) }
       rescue StandardError => e
         duration = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
-        { name: @name, healthy: false, duration: duration.round(4), error: e.message }
+        { name: @name, healthy: false, critical: @critical, duration: duration.round(4), error: e.message }
       end
 
       private
