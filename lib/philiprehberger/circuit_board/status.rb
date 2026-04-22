@@ -18,6 +18,37 @@ module Philiprehberger
         @results.all? { |r| r[:healthy] }
       end
 
+      # Return check results that failed.
+      #
+      # @return [Array<Hash>]
+      def unhealthy_checks
+        @results.reject { |r| r[:healthy] }
+      end
+
+      # Return check results that passed.
+      #
+      # @return [Array<Hash>]
+      def healthy_checks
+        @results.select { |r| r[:healthy] }
+      end
+
+      # Total wall-clock duration (max of individual durations).
+      #
+      # @return [Float]
+      def duration
+        return 0.0 if @results.empty?
+
+        @results.map { |r| r[:duration] || 0.0 }.max
+      end
+
+      # JSON representation.
+      #
+      # @return [String]
+      def to_json(*_args)
+        require 'json'
+        JSON.generate(to_h)
+      end
+
       # Whether the system is degraded: all critical checks pass but at least one non-critical fails.
       #
       # @return [Boolean]

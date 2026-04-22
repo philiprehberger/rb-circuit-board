@@ -24,9 +24,14 @@ module Philiprehberger
 
     # Run all configured health checks and return an aggregated status.
     #
+    # @param parallel [Boolean] run checks concurrently in threads (default: false)
     # @return [Status] the aggregated health status
-    def self.check
-      results = @configuration.checks.map(&:call)
+    def self.check(parallel: false)
+      results = if parallel
+                  run_checks_parallel
+                else
+                  @configuration.checks.map(&:call)
+                end
       status = Status.new(results)
 
       new_status = status.to_h[:status]
@@ -50,6 +55,14 @@ module Philiprehberger
 
       check_obj.call
     end
+
+    def self.run_checks_parallel
+      threads = @configuration.checks.map do |check_obj|
+        Thread.new { check_obj.call }
+      end
+      threads.map(&:value)
+    end
+    private_class_method :run_checks_parallel
 
     # Reset all configured checks.
     #

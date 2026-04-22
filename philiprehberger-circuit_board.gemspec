@@ -10,8 +10,9 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Health check framework with dependency aggregation and Rack endpoint'
   spec.description = 'Health check framework that aggregates dependency checks with configurable ' \
-                     'timeouts. Provides a DSL for defining checks, aggregated status reporting, ' \
-                     'and Rack middleware for /health, /health/ready, and /health/live endpoints.'
+                     'timeouts and optional parallel execution. Provides a DSL for defining checks, ' \
+                     'aggregated status reporting with filtering and JSON output, and Rack middleware ' \
+                     'for /health, /health/ready, and /health/live endpoints.'
   spec.homepage = 'https://philiprehberger.com/open-source-packages/ruby/philiprehberger-circuit_board'
   spec.license = 'MIT'
 
