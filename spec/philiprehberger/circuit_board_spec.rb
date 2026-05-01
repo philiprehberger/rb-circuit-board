@@ -649,4 +649,64 @@ RSpec.describe Philiprehberger::CircuitBoard do
       expect(parsed['checks']).to be_a(Array)
     end
   end
+
+  describe 'cache: option' do
+    after { described_class.reset! }
+
+    it 'returns the cached result while within the TTL' do
+      counter = 0
+      described_class.configure do
+        check(:slow, cache: 60) do
+          counter += 1
+          true
+        end
+      end
+
+      first = described_class.check
+      second = described_class.check
+      expect(first.results.first[:duration]).to eq(second.results.first[:duration])
+      expect(counter).to eq(1)
+    end
+
+    it 're-runs the check on every call when cache: is not set' do
+      counter = 0
+      described_class.configure do
+        check(:fresh) do
+          counter += 1
+          true
+        end
+      end
+
+      described_class.check
+      described_class.check
+      expect(counter).to eq(2)
+    end
+
+    it 'does not cache failed results' do
+      counter = 0
+      described_class.configure do
+        check(:flaky, cache: 60) do
+          counter += 1
+          false
+        end
+      end
+
+      described_class.check
+      described_class.check
+      expect(counter).to eq(2)
+    end
+
+    it 're-runs after the cache TTL expires' do
+      counter = 0
+      check_obj = Philiprehberger::CircuitBoard::Check.new(:short_ttl, cache: 0.05) do
+        counter += 1
+        true
+      end
+
+      check_obj.call
+      sleep(0.1)
+      check_obj.call
+      expect(counter).to eq(2)
+    end
+  end
 end

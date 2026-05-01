@@ -94,6 +94,18 @@ status.unhealthy_checks  # => []
 status.to_json           # => '{"status":"healthy","checks":[...]}'
 ```
 
+### Caching Expensive Checks
+
+```ruby
+Philiprehberger::CircuitBoard.configure do
+  # Cache successful database probe for 30 seconds
+  check(:database, cache: 30) { ActiveRecord::Base.connection.active? }
+end
+
+# First call hits the DB; subsequent calls within 30s return the cached result.
+# Failed checks are never cached — failures re-run on every probe.
+```
+
 ### Check Timeouts
 
 ```ruby
@@ -120,7 +132,7 @@ end
 
 | Method | Description |
 |--------|-------------|
-| `.configure { ... }` | Define health checks using the DSL (`check(name, timeout:, critical:)`) |
+| `.configure { ... }` | Define health checks using the DSL (`check(name, timeout:, critical:, cache:)`) |
 | `.check(parallel: false)` | Run all checks and return a Status; `parallel: true` runs concurrently |
 | `.check_one(name)` | Run a single named check and return its result hash |
 | `.reset!` | Remove all configured checks |

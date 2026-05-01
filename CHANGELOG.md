@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-30
+
+### Added
+- `cache:` option on `check(...)` to cache successful results for a TTL window — reduces load on expensive dependencies when health endpoints are probed frequently. Failed checks are not cached.
+
 ## [0.5.0] - 2026-04-10
 
 ### Added
